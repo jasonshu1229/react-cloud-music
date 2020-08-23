@@ -5,7 +5,8 @@ import Scroll from '../../baseUI/scroll/index';
 import { Content } from './style';
 import { connect } from 'react-redux';
 import * as actionTypes from './store/actionCreators';
-
+// 引入 forceCheck 方法 配合懒加载 插件 实现滑动列表 加载相应的图片
+import { forceCheck } from 'react-lazyload';
 
 function Recommend (props) {
 
@@ -26,7 +27,7 @@ function Recommend (props) {
 
   return (
     <Content>
-      <Scroll className="list">
+      <Scroll className="list" onScroll={forceCheck}>
         <div>
           <Slider bannerList={bannerListJS}></Slider>
           <RecommendList recommendList={recommendListJS}></RecommendList>

@@ -44,16 +44,9 @@ const Scroll = forwardRef((props, ref) => {
 
   }, [])
 
-  // 每次重新渲染都要刷新实例，防止无法滑动:
-  useEffect(() => {
-    if (refresh && bScroll) {
-      bScroll.refresh(); //重新计算子容器和父容器内容的高度 来确保滚动效果 （要求：子容器内容的高度 超过 父容器内容的高度，才可以滑动）
-    }
-  })
-
   // 给实例绑定 scroll 事件
   useEffect(() => {
-    if (!bScroll || !onscroll) return;
+    if (!bScroll || !onScroll) return;
     bScroll.on('scroll', (scroll) => {
       onScroll(scroll);
     })
@@ -84,6 +77,13 @@ const Scroll = forwardRef((props, ref) => {
       bScroll.off('touchEnd');
     }
   }, [pullDown, bScroll])
+
+  // 每次重新渲染都要刷新实例，防止无法滑动:
+  useEffect(() => {
+    if (refresh && bScroll) {
+      bScroll.refresh(); //重新计算子容器和父容器内容的高度 来确保滚动效果 （要求：子容器内容的高度 超过 父容器内容的高度，才可以滑动）
+    }
+  })
 
   useImperativeHandle(ref, () => ({
     // 给外界暴露 refresh 方法
