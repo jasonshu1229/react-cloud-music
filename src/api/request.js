@@ -18,6 +18,11 @@ export const getSingerListRequest = (category, alpha, count) => {
   );
 };
 
+// 请求 排行榜单数据
+export const getRankListRequest = () => {
+  return axiosInstance.get (`/toplist/detail`);
+};
+
 
 
 // export const getSingerListRequest= (category, alpha, count) => {

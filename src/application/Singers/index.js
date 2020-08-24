@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import Horizen from '../../baseUI/horizen-item';
 import { categoryTypes, alphaTypes } from '../../api/config';
 import { 
@@ -85,32 +85,34 @@ function Singers (props) {
 
   return (
     <div>
-      <NavContainer>
-        <Horizen 
-          list={categoryTypes} 
-          title={"分类(默认热门):"} 
-          handleClick={(val) => handleUpdateCatetory(val)} 
-          oldVal={category}
-        ></Horizen>
-        <Horizen 
-          list={alphaTypes} 
-          title={"首字母:"} 
-          handleClick={val => handleUpdateAlpha(val)} 
-          oldVal={alpha}
-        ></Horizen>
-      </NavContainer>
-      <ListContainer>
-        <Scroll 
-          pullUp={ handlePullUp }
-          pullDown = { handlePullDown }
-          pullUpLoading = { pullUpLoading }
-          pullDownLoading = { pullDownLoading }
-          onScroll={forceCheck}
-        >
-          {renderSingerList()}
-        </Scroll>
-        <Loading show={enterLoading}></Loading>
-      </ListContainer>
+      <Data>
+        <NavContainer>
+          <Horizen 
+            list={categoryTypes} 
+            title={"分类(默认热门):"} 
+            handleClick={(val) => handleUpdateCatetory(val)} 
+            oldVal={category}
+          ></Horizen>
+          <Horizen 
+            list={alphaTypes} 
+            title={"首字母:"} 
+            handleClick={val => handleUpdateAlpha(val)} 
+            oldVal={alpha}
+          ></Horizen>
+        </NavContainer>
+        <ListContainer>
+          <Scroll 
+            pullUp={ handlePullUp }
+            pullDown = { handlePullDown }
+            pullUpLoading = { pullUpLoading }
+            pullDownLoading = { pullDownLoading }
+            onScroll={forceCheck}
+          >
+            {renderSingerList()}
+          </Scroll>
+          <Loading show={enterLoading}></Loading>
+        </ListContainer>
+      </Data>
     </div>
   )
 }

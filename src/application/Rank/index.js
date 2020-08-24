@@ -1,9 +1,112 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { getRankList } from './store/index';
+import { connect }  from 'react-redux';
+import { filterIndex, filterIdx } from '../../api/utils';
+import {
+  List, 
+  ListItem,
+  SongList,
+  Container
+} from './style';
+import { EnterLoading } from './../Singers/style';
+import Scroll from '../../baseUI/scroll/index';
+import Loading from '../../baseUI/loading/index';
+import { renderRoutes } from 'react-router-config';
 
 function Rank (props) {
+  
+  // 引入 容器组件 传递的 state
+  const { rankList:list, loading } = props;
+  // 引入 容器组件 传递的 action 用于异步请求
+  const { getRankListDataDispatch } = props;
+
+  let rankList = list ? list.toJS() : [];
+
+  useEffect(() => {
+    if(!rankList.length) { // Rank 列表数据不为空
+      getRankListDataDispatch(); // dispatch 到 reducer中，修改 store的状态
+    }
+  }, [])  // DidMount 的时候发送 Ajax 请求:
+
+  // 处理 全球榜 和 官方榜 请求回的数据
+  let globalStartIndex = filterIndex(rankList);
+  let officialList = rankList.slice(0, globalStartIndex);
+  let globalList = rankList.slice(globalStartIndex);
+
+  const enterDetail = (name) => {
+    const idx = filterIdx(name);
+    if(idx === null) {
+      alert("暂无相关数据");
+      return;
+    } 
+  }
+
+  // 渲染歌曲列表榜单
+  const renderSongList = (list) => {
+    return list.length ? (
+      <SongList>
+        {
+          list.map((item,index) => {
+            return <li key={index}>{index+1}. {item.first} - {item.second}</li>
+          })
+        }
+      </SongList>
+    ) : null;
+  }
+
+  //  渲染 官方榜单 | 全球榜单
+  const renderRankList = (list, global) => {
+    return (
+      <List globalRank={global}>
+       {
+        list.map((item,index) => {
+          return (
+            <ListItem key={`${item.coverImgId}${index}`} tracks={item.tracks} onClick={() => enterDetail(item.name)}>
+              <div className="img_wrapper">
+                <img src={item.coverImgUrl} alt=""/>
+                <div className="decorate"></div>
+                <span className="update_frequecy">{item.updateFrequency}</span>
+              </div>
+              { renderSongList(item.tracks)  }
+            </ListItem>
+          )
+       })
+      } 
+      </List>
+    )
+  }
+  
+  // 榜单数据未加载出来之前 全部隐藏
+  let displayStyle = loading ? {"display": "none"} : {"display": ""};
   return (
-    <div>Rank</div>
+    <Container>
+      <Scroll>
+        <div>
+          <h1 className="offical" style={displayStyle}>官方榜</h1>
+            { renderRankList(officialList) }
+          <h1 className="global" style={displayStyle}>全球榜</h1>
+            { renderRankList(globalList, true) }
+          { loading ? <EnterLoading><Loading></Loading></EnterLoading> : null }
+        </div>
+      </Scroll> 
+      {renderRoutes(props.route.routes)}
+    </Container>
   )
 }
 
-export default React.memo(Rank);
+// 映射 Redux 全局的 state 到组建的 props上
+const mapStateToProps = (state) => ({
+  rankList: state.getIn(['rank', 'rankList']),
+  loading: state.getIn(['rank', 'loading']),
+});
+
+// 映射 dispatch 到 props 上
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getRankListDataDispatch() {
+      dispatch(getRankList())
+    }
+  }
+}
+
+export default connect (mapStateToProps, mapDispatchToProps) (React.memo(Rank));

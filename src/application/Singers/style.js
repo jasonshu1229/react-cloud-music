@@ -1,4 +1,4 @@
-import styled from'styled-components';
+import styled from 'styled-components';
 import style from '../../assets/global-style';
 
 // todo 解决横向列表的滚动问题 添加一个 NavContainer 容器，宽度100%
@@ -55,3 +55,11 @@ export const ListItem = styled.div`
     font-weight: 500;
   }
 `;
+
+export const EnterLoading = styled.div`
+  position: fixed;
+  left: 0; right: 0; top: 0; bottom: 0;
+  width: 100px;
+  height: 100px;
+  margin: auto;
+`
