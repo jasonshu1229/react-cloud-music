@@ -1,17 +1,44 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import { Container, TopDesc, Menu, SongList, SongItem } from './style';
 import { CSSTransition } from 'react-transition-group';
 import  Header  from './../../baseUI/header/index';
 import Scroll from '../../baseUI/scroll/index';
 import { getCount, isEmptyObject, getName } from '../../api/utils';
+import style from "../../assets/global-style";
+
+export const HEADER_HEIGHT = 45;
 
 function Album (props) {
   const [showStatus, setShowStatus] = useState (true);
   const handleBack = () => {
     setShowStatus(false)
   }
+  const [title, setTitle] = useState("歌单");
+  const [isMarquee, setIsMarquee] = useState(false); // 是否跑马灯（文字滚动效果）
+  const headerEl = useRef (); // 获取Header 组件
+
+  // todo 实现 header内 文字滚动 走马灯的逻辑
+  const handleScroll = (pos) => {
+    let minScrollY = -HEADER_HEIGHT; // 滚动条最小的 纵坐标
+    let percent = Math.abs (pos.y/minScrollY); // pos.y 滚动条的 纵轴坐标
+    let headerDom = headerEl.current; // 通过 ref 获取header组件的 当时 dom元素
+    // 滑过顶部的高度开始变化
+    if (pos.y < minScrollY) {
+      headerDom.style.backgroundColor = style["theme-color"];
+      headerDom.style.opacity = Math.min (1, (percent-1)/2);
+      setTitle (currentAlbum.name);
+      setIsMarquee (true);
+    } else {
+      headerDom.style.backgroundColor = "";
+      headerDom.style.opacity = 1;
+      setTitle ("歌单");
+      setIsMarquee (false);
+    }
+  };
+
   //mock 数据
   const currentAlbum = {
+
     creator: {
       avatarUrl: "http://p1.music.126.net/O9zV6jeawR43pfiK2JaVSw==/109951164232128905.jpg",
       nickname: "浪里推舟"
@@ -190,12 +217,12 @@ function Album (props) {
       onExited={props.history.goBack} // 执行退出动画的时候， 跳转路由
     >
       <Container>
-        < Header title={"返回"} handleClick={handleBack}></Header>
+        < Header ref={headerEl} title={title}handleClick={handleBack} isMarquee={isMarquee}></Header>
         {
           (
             <Scroll
               bounceTop={false}
-              // onScroll={handleScroll}
+              onScroll={handleScroll}
             >
               <div>
                 { renderTopDesc() }
