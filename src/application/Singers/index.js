@@ -22,7 +22,6 @@ import {connect} from 'react-redux';
 import  LazyLoad, {forceCheck} from 'react-lazyload';
 import Loading from '../../baseUI/loading';
 
-
 // item 样式随当前索引值变化 
 function Singers (props) {
 
@@ -31,7 +30,7 @@ function Singers (props) {
 
   const { singerList, enterLoading, pullUpLoading, pullDownLoading, pageCount } = props;
   const { getHotSingerDispatch, updateDispatch, pullDownRefreshDispatch, pullUpRefreshDispatch } = props;
-  
+
   useEffect(() => {
     getHotSingerDispatch();
     // eslint-disable-next-line

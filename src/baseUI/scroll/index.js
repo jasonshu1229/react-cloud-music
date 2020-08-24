@@ -1,9 +1,10 @@
-import React, { forwardRef, useState,useEffect, useRef, useImperativeHandle } from "react"
+import React, { forwardRef, useState,useEffect, useRef,useMemo, useImperativeHandle } from "react"
 import PropTypes from "prop-types"
 import BScroll from "better-scroll"
 import styled from 'styled-components';
 import Loading from '../loading/index';
 import LoadingV2 from '../loading-v2/index';
+import { debounce } from "../../api/utils";
 
 const ScrollContainer = styled.div`
   width: 100%;
@@ -39,6 +40,19 @@ const Scroll = forwardRef((props, ref) => {
   // 从外面接受 props，解构赋值拿到这些参数:
   const { direction, click, refresh, pullUpLoading, pullDownLoading, bounceTop, bounceBottom } = props;
   const { pullUp, pullDown, onScroll } = props;
+
+  // 优化 上拉加载函数
+  let pullUpDebounce = useMemo(() => {
+    return debounce(pullUp, 300);
+  }, [pullUp]);
+  // todo 千万注意 不能省略依赖项
+  // 不然始终拿到的都是第一次 pullUp 函数的引用，相应的闭包作用域变量都是第一次的，产生闭包陷阱。
+  // 都是拿到老的函数，而不是最新的。
+
+  // 优化 下拉刷新函数
+  let pullDownDebounce = useMemo(() => {
+    return debounce(pullDown, 300)
+  }, [pullDown]);
 
   // 接下来创建 better-scroll
   useEffect(() => {
@@ -85,31 +99,33 @@ const Scroll = forwardRef((props, ref) => {
   // 进行上拉到底的判断，调用上拉刷新的函数
   useEffect(() => {
     if(!bScroll || !pullUp) return;
-    // 判断是否滑动到了底部
-    console.log('y', bScroll.y)
-    console.log('maxScrollY', bScroll.maxScrollY)
-    console.log(bScroll.y < bScroll.maxScrollY + 100)
-    if(bScroll.y < bScroll.maxScrollY + 100) {
-      pullUp ();
+    const handlePullUp = () => {
+      // 判断是否滑动到了底部
+      if(bScroll.y < bScroll.maxScrollY + 100) {
+        pullUpDebounce();
+      }
     }
+    bScroll.on('scrollEnd', handlePullUp) // 监听 滚动结束 事件
+    
     return () => {
-      bScroll.off('scrollEnd') // 移除scrollEnd（滚动结束）事件
+      bScroll.off('scrollEnd', handlePullUp) // 移除scrollEnd（滚动结束）事件
     }
-  })
+  }, [pullUp, pullUpDebounce, bScroll])
 
   // 进行下拉的判断，调用下拉刷新的函数
   useEffect(() => {
     if(!bScroll || !pullDown) return;
-    bScroll.on('touchEnd', (pos) => {
+    const handlePullDown = (pos) => {
       // 判断用户的下拉动作  y 一般为 正数
       if(pos.y > 50) {
-        pullDown()
+        pullDownDebounce()
       }
-    });
-    return () => {
-      bScroll.off('touchEnd');
     }
-  }, [pullDown, bScroll])
+    bScroll.on('touchEnd', handlePullDown); // 监听 鼠标/手指离开 事件
+    return () => {
+      bScroll.off('touchEnd', handlePullDown); // 销毁时解绑
+    }
+  }, [pullDown, bScroll, pullDownDebounce])
 
   // 每次重新渲染都要刷新实例，防止无法滑动:
   useEffect(() => {
