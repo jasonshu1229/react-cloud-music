@@ -8,9 +8,9 @@ import * as actionTypes from './store/actionCreators';
 // 引入 forceCheck 方法 配合懒加载 插件 实现滑动列表 加载相应的图片
 import { forceCheck } from 'react-lazyload';
 import Loading from '../../baseUI/loading/index';
+import { renderRoutes } from 'react-router-config';
 
 function Recommend (props) {
-
   // 从 store中的 reducer 获取公共状态
   const { bannerList, recommendList, enterLoading } = props;
 
@@ -39,6 +39,8 @@ function Recommend (props) {
         </div>
       </Scroll>
       { enterLoading ? <Loading></Loading> : null}
+      {/* 将目前所在路由的下一层子路由加以渲染 */}
+      { renderRoutes (props.route.routes) }
     </Content>
   )
 }
