@@ -20,6 +20,7 @@ import {
 } from './store/actionCreators';
 import {connect} from 'react-redux';
 import  LazyLoad, {forceCheck} from 'react-lazyload';
+import Loading from '../../baseUI/loading';
 
 
 // item 样式随当前索引值变化 
@@ -29,9 +30,8 @@ function Singers (props) {
   let [alpha, setAlpha] = useState('');
 
   const { singerList, enterLoading, pullUpLoading, pullDownLoading, pageCount } = props;
-
   const { getHotSingerDispatch, updateDispatch, pullDownRefreshDispatch, pullUpRefreshDispatch } = props;
-
+  
   useEffect(() => {
     getHotSingerDispatch();
     // eslint-disable-next-line
@@ -97,9 +97,16 @@ function Singers (props) {
         ></Horizen>
       </NavContainer>
       <ListContainer>
-        <Scroll>
+        <Scroll 
+          pullUp={ handlePullUp }
+          pullDown = { handlePullDown }
+          pullUpLoading = { pullUpLoading }
+          pullDownLoading = { pullDownLoading }
+          onScroll={forceCheck}
+        >
           {renderSingerList()}
         </Scroll>
+        <Loading show={enterLoading}></Loading>
       </ListContainer>
     </div>
   )

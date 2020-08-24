@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, memo } from 'react';
-import styled from'styled-components';
+import React, { useRef, useEffect, memo } from 'react';
+import styled from 'styled-components';
 import Scroll from '../scroll/index'
 import { PropTypes } from 'prop-types'; // 检测数据类型
 import style from '../../assets/global-style';
@@ -94,4 +94,4 @@ Horizen.propTypes = {
   title: PropTypes.string,
   handleClick: PropTypes.func
 };
-export default memo (Horizen);
+export default memo(Horizen);

@@ -19,7 +19,6 @@ function Recommend (props) {
 
   // bannerList.size 轮播图和推荐列表的 数量
   useEffect(() => {
-    console.log('bannerList', bannerList)
     if(!bannerList.size) {
       getBannerDataDispatch();
     }
@@ -31,7 +30,6 @@ function Recommend (props) {
   const bannerListJS = bannerList ? bannerList.toJS() : [];
   const recommendListJS = recommendList ? recommendList.toJS() : [];
 
-  console.log('recommend 组件中的 props.enterLoading', props.enterLoading)
   return (
     <Content>
       <Scroll className="list" onScroll={forceCheck}>

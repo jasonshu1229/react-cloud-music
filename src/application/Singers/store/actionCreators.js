@@ -15,6 +15,16 @@ import {
   fromJS
 } from 'immutable';
 
+// export const changeCategory = (data) => ({
+//   type: CHANGE_CATOGORY,
+//   data
+// });
+
+// export const changeAlpha = (data) => ({
+//   type: CHANGE_ALPHA,
+//   data
+// });
+
 const changeSingerList = (data) => ({
   type: CHANGE_SINGER_LIST,
   data: fromJS(data)
@@ -49,15 +59,28 @@ export const getHotSingerList = () => {
     getHotSingerListRequest(0).then(res => {
       const data = res.artists;
       dispatch(changeSingerList(data));
-      dispatch(changeEnterLoading(data));
-      dispatch(changePullDownLoading(data));
+      dispatch(changeEnterLoading(false));
+      dispatch(changePullDownLoading(false));
     }).catch(() => {
       console.log('热门歌手数据获取失败');
     })
   }
 };
+export const refreshMoreHotSingerList = () => {
+  return (dispatch, getState) => {
+    const pageCount = getState().getIn(['singers', 'pageCount']);
+    const singerList = getState().getIn(['singers', 'singerList']).toJS();
+    getHotSingerListRequest(pageCount).then(res => {
+      const data = [...singerList, ...res.artists];
+      dispatch(changeSingerList(data));
+      dispatch(changePullUpLoading(false));
+    }).catch(() => {
+      console.log('热门歌手数据获取失败');
+    });
+  }
+};
 
-//第一次加载对应类别的歌手
+
 export const getSingerList = (category, alpha) => {
   return (dispatch, getState) => {
     getSingerListRequest(category, alpha, 0).then(res => {
@@ -71,7 +94,6 @@ export const getSingerList = (category, alpha) => {
   }
 };
 
-//加载更多歌手
 export const refreshMoreSingerList = (category, alpha) => {
   return (dispatch, getState) => {
     const pageCount = getState().getIn(['singers', 'pageCount']);
@@ -82,21 +104,6 @@ export const refreshMoreSingerList = (category, alpha) => {
       dispatch(changePullUpLoading(false));
     }).catch(() => {
       console.log('歌手数据获取失败');
-    });
-  }
-};
-
-//加载更多热门歌手
-export const refreshMoreHotSingerList = () => {
-  return (dispatch, getState) => {
-    const pageCount = getState().getIn(['singers', 'pageCount']);
-    const singerList = getState().getIn(['singers', 'singerList']).toJS();
-    getHotSingerListRequest(pageCount).then(res => {
-      const data = [...singerList, ...res.artists];
-      dispatch(changeSingerList(data));
-      dispatch(changePullUpLoading(false));
-    }).catch(() => {
-      console.log('热门歌手数据获取失败');
     });
   }
 };

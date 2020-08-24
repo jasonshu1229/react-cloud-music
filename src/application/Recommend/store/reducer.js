@@ -10,7 +10,6 @@ const defaultState = fromJS({
 
 //  将 store reducer中的公共状态传给 ui组件 - Recommend
 export default (state = defaultState, action) => {
-  console.log('action',action)
   switch(action.type) {
     case actionTypes.CHANGE_BANNER:
       return state.set('bannerList', action.data); // action： {type: "recommend/CHANGE_BANNER", data: List}

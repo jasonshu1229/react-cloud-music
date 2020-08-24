@@ -2,12 +2,33 @@ import React, { forwardRef, useState,useEffect, useRef, useImperativeHandle } fr
 import PropTypes from "prop-types"
 import BScroll from "better-scroll"
 import styled from 'styled-components';
+import Loading from '../loading/index';
+import LoadingV2 from '../loading-v2/index';
 
 const ScrollContainer = styled.div`
   width: 100%;
   height: 100%;
   overflow: hidden;
-`
+`;
+
+const PullUpLoading = styled.div`
+  position: absolute;
+  left:0; right:0;
+  bottom: 5px;
+  width: 60px;
+  height: 60px;
+  margin: auto;
+  z-index: 100;
+`;
+
+export const PullDownLoading = styled.div`
+  position: absolute;
+  left:0; right:0;
+  top: 0px;
+  height: 30px;
+  margin: auto;
+  z-index: 100;
+`;
 
 const Scroll = forwardRef((props, ref) => {
   // 实例 better-scroll 对象
@@ -52,10 +73,22 @@ const Scroll = forwardRef((props, ref) => {
     })
   }, [onScroll, bScroll])
 
+  /*
+    y
+    scroll 纵轴坐标。
+
+    maxScrollY
+    作用：scroll 最大纵向滚动位置。
+    备注：scroll 纵向滚动的位置区间是 0 - maxScrollY，并且 maxScrollY 是负值。
+  */
+
   // 进行上拉到底的判断，调用上拉刷新的函数
   useEffect(() => {
     if(!bScroll || !pullUp) return;
     // 判断是否滑动到了底部
+    console.log('y', bScroll.y)
+    console.log('maxScrollY', bScroll.maxScrollY)
+    console.log(bScroll.y < bScroll.maxScrollY + 100)
     if(bScroll.y < bScroll.maxScrollY + 100) {
       pullUp ();
     }
@@ -68,7 +101,7 @@ const Scroll = forwardRef((props, ref) => {
   useEffect(() => {
     if(!bScroll || !pullDown) return;
     bScroll.on('touchEnd', (pos) => {
-      // 判断用户的下拉动作
+      // 判断用户的下拉动作  y 一般为 正数
       if(pos.y > 50) {
         pullDown()
       }
@@ -101,10 +134,17 @@ const Scroll = forwardRef((props, ref) => {
     }
   }))
 
+  // pullUpLoading pullDownLoading 都是外部组件给Scroll 组件传入的
+  const PullUpdisplayStyle = pullUpLoading ? {display: ""} : {display: "none"};
+  const PullDowndisplayStyle = pullDownLoading ? { display: ""} : { display:"none" };
 
   return (
     <ScrollContainer ref={scrollContaninerRef}>
       {props.children}
+      {/* 滑到底部加载动画 */}
+      <PullUpLoading style={ PullUpdisplayStyle }><Loading></Loading></PullUpLoading>
+      {/* 顶部下拉刷新动画 */}
+      <PullDownLoading style={ PullDowndisplayStyle }><LoadingV2></LoadingV2></PullDownLoading>
     </ScrollContainer>
   )
 })
