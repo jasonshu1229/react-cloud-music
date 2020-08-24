@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Horizen from '../../baseUI/horizen-item';
 import { categoryTypes, alphaTypes } from '../../api/config';
 import { 
@@ -21,31 +21,35 @@ import {
 import {connect} from 'react-redux';
 import  LazyLoad, {forceCheck} from 'react-lazyload';
 import Loading from '../../baseUI/loading';
+import {CategoryDataContext} from './data';
+import { CHANGE_CATEGORY, CHANGE_ALPHA, Data } from './data';
 
 // item 样式随当前索引值变化 
 function Singers (props) {
 
-  let [category, setCategory] = useState('');;
-  let [alpha, setAlpha] = useState('');
+  const {data, dispatch} = useContext (CategoryDataContext);
+  // 拿到 category 和 alpha 的值
+  const {category, alpha} = data.toJS ();
 
   const { singerList, enterLoading, pullUpLoading, pullDownLoading, pageCount } = props;
   const { getHotSingerDispatch, updateDispatch, pullDownRefreshDispatch, pullUpRefreshDispatch } = props;
 
+  // 歌手列表页的数据缓存
   useEffect(() => {
-    getHotSingerDispatch();
-    // eslint-disable-next-line
-  }, []);
+    if(!singerList.size) {
+      getHotSingerDispatch();
+    }
+  }, []); 
+  // 当歌手列表不为空时，就不发 Ajax 请求，同时能够记忆之前的分类，让分类和列表对应，正是我们想要的效果。
 
   let handleUpdateAlpha = (val) => {
-    setAlpha(val);
-    // 更新 字母栏
-    updateDispatch(category, val);
+    dispatch ({type: CHANGE_ALPHA, data: val});
+    updateDispatch (category, val);
   };
 
   let handleUpdateCatetory = (val) => {
-    setCategory(val);
-    // 更新 歌手分类栏
-    updateDispatch(val, alpha);
+    dispatch ({type: CHANGE_CATEGORY, data: val});
+    updateDispatch (val, alpha);
   };
 
   const handlePullUp = () => {

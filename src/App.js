@@ -5,7 +5,8 @@ import { GlobalStyle } from  './style';
 import routes from './routes/index.js';
 import { HashRouter } from 'react-router-dom';
 import store from './store/index.js';
-import { Provider } from 'react-redux'; // connect ??
+import { Provider } from 'react-redux'; 
+import { Data } from './application/Singers/data';
 
 function App() {
   return (
@@ -13,7 +14,9 @@ function App() {
       <HashRouter>
         <GlobalStyle></GlobalStyle>
         <IconStyle></IconStyle>
-        { renderRoutes (routes) }
+        <Data>
+          { renderRoutes (routes) }
+        </Data>
         </HashRouter>
     </Provider>
   );
