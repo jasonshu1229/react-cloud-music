@@ -1,10 +1,13 @@
 import React, {useState} from 'react';
 import { Container} from './style';
 import { CSSTransition } from 'react-transition-group';
+import  Header  from './../../baseUI/header/index';
 
 function Album (props) {
   const [showStatus, setShowStatus] = useState (true);
-
+  const handleBack = () => {
+    setShowStatus(false)
+  }
   return (
     <CSSTransition
       in={showStatus}
@@ -12,10 +15,10 @@ function Album (props) {
       classNames="fly"
       appear={true}
       unmountOnExit
-      onExited={props.history.goBack}
+      onExited={props.history.goBack} // 执行退出动画的时候， 跳转路由
     >
       <Container>
-        11111
+      < Header title={"返回"} handleClick={handleBack}></Header>
       </Container>
     </CSSTransition>
   )
