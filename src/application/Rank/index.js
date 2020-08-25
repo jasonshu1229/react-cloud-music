@@ -33,12 +33,14 @@ function Rank (props) {
   let officialList = rankList.slice(0, globalStartIndex);
   let globalList = rankList.slice(globalStartIndex);
 
-  const enterDetail = (name) => {
-    const idx = filterIdx(name);
-    if(idx === null) {
-      alert("暂无相关数据");
-      return;
-    } 
+  // 之前排行歌单不存在的问题已经收到小伙伴的 pr，完美解决，因此直接拿到 id 跳转即可，无关代码已经在当前分支删除
+  const enterDetail = (detail) => {
+    // const idx = filterIdx(name);
+    // if(idx === null) {
+    //   alert("暂无相关数据");
+    //   return;
+    // } 
+    props.history.push(`/rank/${detail.id}`)
   }
 
   // 渲染歌曲列表榜单
@@ -61,7 +63,7 @@ function Rank (props) {
        {
         list.map((item,index) => {
           return (
-            <ListItem key={`${item.coverImgId}${index}`} tracks={item.tracks} onClick={() => enterDetail(item.name)}>
+            <ListItem key={`${item.coverImgId}${index}`} tracks={item.tracks} onClick={() => enterDetail(item)}>
               <div className="img_wrapper">
                 <img src={item.coverImgUrl} alt=""/>
                 <div className="decorate"></div>
