@@ -6,11 +6,24 @@ import { ImgWrapper, CollectButton, SongListWrapper, BgLayer } from "./style";
 import Scroll from "../../baseUI/scroll/index";
 import SongsList from "../SongsList";
 import { HEADER_HEIGHT } from "./../../api/config";
+import { connect } from 'react-redux';
+import { getSingerInfo, changeEnterLoading } from "./store/actionCreators";
+import Loading from "./../../baseUI/loading/index";
 
 function Singer (props) {
-  
   const initialHeight = useRef(0); // 获得图片的初始高度
   const [showStatus, setShowStatus] = useState (true);
+
+  const {
+    artist: immutableArtist,
+    songs: immutableSongs,
+    loading,
+  } = props;
+
+  const { getSingerDataDispatch } = props;
+
+  const artist = immutableArtist.toJS();
+  const songs = immutableSongs.toJS();
 
   const collectButton = useRef();
   const imageWrapper = useRef();
@@ -22,18 +35,16 @@ function Singer (props) {
   //往上偏移的尺寸，露出圆角
   const OFFSET = 5;
 
-  useEffect (() => {
+  useEffect(() => {
+    const id = props.match.params.id;
+    getSingerDataDispatch(id);
     let h = imageWrapper.current.offsetHeight;
-    songScrollWrapper.current.style.top = `${h - OFFSET} px`;
     initialHeight.current = h;
-    // 把遮罩先放在下面，以裹住歌曲列表
-    layer.current.style.top = `${h - OFFSET} px`;
-    songScroll.current.refresh ();
-    //eslint-disable-next-line
-  }, []);
-
-  const setShowStatusFalse = useCallback (() => {
-    setShowStatus (false);
+    songScrollWrapper.current.style.top = `${h - OFFSET}px`;
+    //把遮罩先放在下面，以裹住歌曲列表
+    layer.current.style.top = `${h - OFFSET}px`;
+    songScroll.current.refresh();
+    // eslint-disable-next-line
   }, []);
 
   const handleScroll = useCallback(pos => {
@@ -45,8 +56,8 @@ function Singer (props) {
     const layerDOM = layer.current;
     const minScrollY = -(height - OFFSET) + HEADER_HEIGHT;
 
-    // 指的是滑动距离占图片高度的百分比
-    const percent = Math.abs (newY /height);
+    //指的是滑动距离占图片高度的百分比
+    const percent = Math.abs(newY / height);
     // 处理往下拉的情况，效果：图片放大，按钮跟着偏移
     if (newY > 0) {
       imageDOM.style["transform"] = `scale(${1 + percent})`;
@@ -75,42 +86,11 @@ function Singer (props) {
       imageDOM.style.paddingTop = 0;
       imageDOM.style.zIndex = 99;
     }
-  })
+  }, [])
 
-  const artist = {
-    picUrl: "https://p2.music.126.net/W__FCWFiyq0JdPtuLJoZVQ==/109951163765026271.jpg",
-    name: "薛之谦",
-    hotSongs: [
-      {
-        name: "我好像在哪见过你",
-        ar: [{name: "薛之谦"}],
-        al: {
-          name: "薛之谦专辑"
-        }
-      },
-      {
-        name: "我好像在哪见过你",
-        ar: [{name: "薛之谦"}],
-        al: {
-          name: "薛之谦专辑"
-        }
-      },
-      {
-        name: "我好像在哪见过你",
-        ar: [{name: "薛之谦"}],
-        al: {
-          name: "薛之谦专辑"
-        }
-      },
-      {
-        name: "我好像在哪见过你",
-        ar: [{name: "薛之谦"}],
-        al: {
-          name: "薛之谦专辑"
-        }
-      },
-    ]
-  }
+  const setShowStatusFalse = useCallback(() => {
+    setShowStatus(false);
+  }, []);
 
   return (
     <CSSTransition
@@ -119,29 +99,49 @@ function Singer (props) {
       classNames="fly"
       appear={true}
       unmountOnExit
-      onExited={() => props.history.goBack ()}
+      onExited={() => props.history.goBack()}
     >
       <Container>
-        <Header title={"头部"} ref={header}></Header>
+        <Header
+          handleClick={setShowStatusFalse}
+          title={artist.name}
+          ref={header}
+        ></Header>
         <ImgWrapper ref={imageWrapper} bgUrl={artist.picUrl}>
           <div className="filter"></div>
         </ImgWrapper>
         <CollectButton ref={collectButton}>
           <i className="iconfont">&#xe62d;</i>
-          <span className="text"> 收藏 </span>
+          <span className="text">收藏</span>
         </CollectButton>
         <BgLayer ref={layer}></BgLayer>
-        <SongListWrapper  ref={songScrollWrapper}>
+        <SongListWrapper ref={songScrollWrapper}>
           <Scroll ref={songScroll} onScroll={handleScroll}>
             <SongsList
-            songs={artist.hotSongs}
-            showCollect={false}>
-            </SongsList>
+              songs={songs}
+              showCollect={false}
+            ></SongsList>
           </Scroll>
         </SongListWrapper>
+        { loading ? (<Loading></Loading>) : null}
       </Container>
     </CSSTransition>
   )
 }
 
-export default Singer;
+const mapStateToProps = (state) => ({
+  artist: state.getIn (["singerInfo", "artist"]),
+  songs: state.getIn (["singerInfo", "songsOfArtist"]),
+  loading: state.getIn (["singerInfo", "loading"]),
+})
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getSingerDataDispatch(id) {
+      dispatch(changeEnterLoading(true));
+      dispatch(getSingerInfo(id));
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Singer);

@@ -3,6 +3,7 @@ import { SongList, SongItem } from "./style";
 import { getName } from '../../api/utils';
 
 const SongsList = React.forwardRef((props, refs) => {
+  
   const { collectCount, showCollect, songs } = props;
 
   const totalCount = songs.length;

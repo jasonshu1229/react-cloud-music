@@ -28,6 +28,11 @@ export const getAlbumDetailRequest = id => {
   return axiosInstance.get (`/playlist/detail?id=${id}`);
 };
 
+// 请求歌手信息 歌曲列表 Singers/Singer
+export const getSingerInfoRequest = id => {
+  return axiosInstance.get (`/artists?id=${id}`);
+};
+
 
 
 // export const getSingerListRequest= (category, alpha, count) => {
