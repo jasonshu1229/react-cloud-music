@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import { Container, TopDesc, Menu, SongList, SongItem } from './style';
 import { CSSTransition } from 'react-transition-group';
 import  Header  from './../../baseUI/header/index';
@@ -13,9 +13,10 @@ export const HEADER_HEIGHT = 45;
 
 function Album (props) {
   const [showStatus, setShowStatus] = useState (true);
-  const handleBack = () => {
+  // useCallback 优化 防止父组件每次渲染 导致 子组件每次的 memo的结果都不一样，导致不必要的渲染
+  const handleBack = useCallback(() => {
     setShowStatus(false)
-  }
+  }, [])
   const [title, setTitle] = useState("歌单");
   const [isMarquee, setIsMarquee] = useState(false); // 是否跑马灯（文字滚动效果）
   const headerEl = useRef (); // 获取Header 组件
@@ -24,6 +25,8 @@ function Album (props) {
   const id = props.match.params.id;
   const { currentAlbum: currentAlbumImmutable, enterLoading } = props;
   const { getAlbumDataDispatch } = props;
+  
+  let currentAlbum = currentAlbumImmutable.toJS ();
 
   // 在didMount 和 UpdateMount中 请求数据
   useEffect(() => {
@@ -31,7 +34,7 @@ function Album (props) {
   }, [getAlbumDataDispatch, id])
 
   // todo 实现 header内 文字滚动 走马灯的逻辑
-  const handleScroll = (pos) => {
+  const handleScroll = useCallback((pos) => {
     let minScrollY = -HEADER_HEIGHT; // 滚动条最小的 纵坐标
     let percent = Math.abs (pos.y/minScrollY); // pos.y 滚动条的 纵轴坐标
     let headerDom = headerEl.current; // 通过 ref 获取header组件的 当时 dom元素
@@ -47,10 +50,9 @@ function Album (props) {
       setTitle ("歌单");
       setIsMarquee (false);
     }
-  };
+  }, [currentAlbum]);
 
-  let currentAlbum = currentAlbumImmutable.toJS ();
-
+  
   // 详情页顶部布局
   const renderTopDesc = () => {
     return (
