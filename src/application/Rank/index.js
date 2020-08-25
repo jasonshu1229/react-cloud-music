@@ -75,7 +75,7 @@ function Rank (props) {
        })
       } 
       </List>
-    )
+    )  
   }
   
   // 榜单数据未加载出来之前 全部隐藏

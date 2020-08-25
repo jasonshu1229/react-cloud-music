@@ -23,6 +23,7 @@ import  LazyLoad, {forceCheck} from 'react-lazyload';
 import Loading from '../../baseUI/loading';
 import {CategoryDataContext} from './data';
 import { CHANGE_CATEGORY, CHANGE_ALPHA, Data } from './data';
+import { renderRoutes } from 'react-router-config';
 
 // item 样式随当前索引值变化 
 function Singers (props) {
@@ -39,8 +40,11 @@ function Singers (props) {
     if(!singerList.size) {
       getHotSingerDispatch();
     }
-  }, []); 
-  // 当歌手列表不为空时，就不发 Ajax 请求，同时能够记忆之前的分类，让分类和列表对应，正是我们想要的效果。
+  }, []); // 当歌手列表不为空时，就不发 Ajax 请求，同时能够记忆之前的分类，让分类和列表对应，正是我们想要的效果。
+
+  const enterDetail = (id) => {
+    props.history.push(`/singers/${id}`)
+  };
 
   let handleUpdateAlpha = (val) => {
     dispatch ({type: CHANGE_ALPHA, data: val});
@@ -68,7 +72,7 @@ function Singers (props) {
         {
           list.map ((item, index) => {
             return (
-              <ListItem key={item.accountId+""+index}>
+              <ListItem key={item.accountId+""+index} onClick={() => enterDetail(item.id)}>
                 <div className="img_wrapper">
                   <LazyLoad placeholder={<img width="100%" height="100%" src={require('./singer.png')} alt="music"/>}>
                     <img src={`${item.picUrl}?param=300x300`} width="100%" height="100%" alt="music"/>
@@ -113,6 +117,8 @@ function Singers (props) {
           <Loading show={enterLoading}></Loading>
         </ListContainer>
       </Data>
+      {/* 将目前所在路由的下一层子路由加以渲染 */}
+      { renderRoutes (props.route.routes) }
     </div>
   )
 }
