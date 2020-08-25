@@ -23,6 +23,11 @@ export const getRankListRequest = () => {
   return axiosInstance.get (`/toplist/detail`);
 };
 
+// 获取每一张专辑的详情
+export const getAlbumDetailRequest = id => {
+  return axiosInstance.get (`/playlist/detail?id=${id}`);
+};
+
 
 
 // export const getSingerListRequest= (category, alpha, count) => {
