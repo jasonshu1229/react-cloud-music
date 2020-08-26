@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { getRankList } from './store/index';
 import { connect }  from 'react-redux';
-import { filterIndex, filterIdx } from '../../api/utils';
+import { filterIndex } from '../../api/utils';
 import {
   List, 
   ListItem,
@@ -26,6 +26,7 @@ function Rank (props) {
     if(!rankList.length) { // Rank 列表数据不为空
       getRankListDataDispatch(); // dispatch 到 reducer中，修改 store的状态
     }
+    // eslint-disable-next-line
   }, [])  // DidMount 的时候发送 Ajax 请求:
 
   // 处理 全球榜 和 官方榜 请求回的数据
@@ -35,11 +36,6 @@ function Rank (props) {
 
   // 之前排行歌单不存在的问题已经收到小伙伴的 pr，完美解决，因此直接拿到 id 跳转即可，无关代码已经在当前分支删除
   const enterDetail = (detail) => {
-    // const idx = filterIdx(name);
-    // if(idx === null) {
-    //   alert("暂无相关数据");
-    //   return;
-    // } 
     props.history.push(`/rank/${detail.id}`)
   }
 
