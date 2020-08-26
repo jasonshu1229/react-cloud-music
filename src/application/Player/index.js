@@ -14,9 +14,26 @@ import NormalPlayer from './normalPlayer';
 
 function Player (props) {
 
-  const { fullScreen } = props;
+  // 目前播放的时间
+  const [currentTime, setCurrentTime] = useState(0);
+  // 歌曲播放总时长
+  const [duration, setDuration] = useState(0);
+  // 歌曲播放进度
+  let percent = isNaN(currentTime / duration) ? 0 : currentTime / duration;
 
+  const { fullScreen } = props;
   const { toggleFullScreenDispatch } = props;
+
+  // 点击改变小球 控制进度条的 长度
+  const onProgressChange = curPercent => {
+    const newTime = curPercent * duration;
+    setCurrentTime(newTime);
+    // audioRef.current.currentTime = newTime;
+    // if (!playing) {
+    //   togglePlayingDispatch(true);
+    // }
+  };
+
   const currentSong = {
     al: { picUrl: "https://p1.music.126.net/JL_id1CFwNJpzgrXwemh4Q==/109951164172892390.jpg" },
     name: "木偶人",
@@ -33,6 +50,8 @@ function Player (props) {
         song={currentSong}
         fullScreen={fullScreen}
         toggleFullScreen={toggleFullScreenDispatch}
+        percent={percent}
+        onProgressChange={onProgressChange}
         ></NormalPlayer>
     </div>
   )

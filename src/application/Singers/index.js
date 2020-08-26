@@ -40,6 +40,7 @@ function Singers (props) {
     if(!singerList.size) {
       getHotSingerDispatch();
     }
+    // eslint-disable-next-line
   }, []); // 当歌手列表不为空时，就不发 Ajax 请求，同时能够记忆之前的分类，让分类和列表对应，正是我们想要的效果。
 
   const enterDetail = (id) => {
